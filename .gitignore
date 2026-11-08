@@ -1,0 +1,24 @@
+# Installed binary and compiler output
+/screen
+/build/
+
+# Local snapshots, rollback copies, and a captured panel image
+/backups/
+/gold-stage-*/
+/current-screen.png
+
+# Cached forecast. It contains a precise home coordinate.
+/weather.json
+
+# Python caches and the packaged Kodi addon
+__pycache__/
+*.py[cod]
+/media/dist/
+
+# Credentials stay in ~/.config/aviato-screen/ and are never committed.
+.env
+.env.*
+*.env
+!spotify.env.example
+spotify-refresh-token
+kite.json

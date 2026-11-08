@@ -1,0 +1,17 @@
+[Unit]
+Description=Aviato private Kite portfolio collector
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/keshav/aviato-screen
+ExecStart=/usr/bin/python3 -m aviato_portfolio collect
+Restart=on-failure
+RestartSec=30
+UMask=0077
+Nice=10
+NoNewPrivileges=true
+LimitCORE=0
+
+[Install]
+WantedBy=default.target

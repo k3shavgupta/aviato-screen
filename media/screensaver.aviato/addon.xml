@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="screensaver.aviato" name="Aviato" version="1.0.0" provider-name="Aviato">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.ui.screensaver" library="default.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Private-safe Aviato dashboard</summary>
+    <description lang="en_GB">Displays the local native dashboard without interrupting music.</description>
+    <platform>linux</platform><license>MIT</license>
+  </extension>
+</addon>

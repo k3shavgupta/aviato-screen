@@ -1,0 +1,34 @@
+[Unit]
+Description=Aviato on-demand Kodi media session
+After=systemd-user-sessions.service user@1000.service
+Conflicts=getty@tty8.service
+
+[Service]
+Type=simple
+User=keshav
+PAMName=login
+WorkingDirectory=/home/keshav/aviato-screen
+Environment=HOME=/home/keshav
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+Environment=XDG_SESSION_TYPE=tty
+Environment=XDG_SESSION_CLASS=user
+Environment=XDG_SEAT=seat0
+Environment=XDG_VTNR=8
+TTYPath=/dev/tty8
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+UtmpIdentifier=tty8
+UtmpMode=user
+ExecStartPre=+/usr/bin/chvt 8
+ExecStart=/usr/bin/python3 /home/keshav/aviato-screen/media/launcher.py
+KillMode=control-group
+TimeoutStopSec=20
+Restart=no
+UMask=0077
+NoNewPrivileges=true
+LimitCORE=0
