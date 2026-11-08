@@ -158,7 +158,10 @@ def shape_playback(raw: dict) -> dict:
 
 # Spotify's Web API does not send lyrics. LRCLIB is a free synced-lyric lookup,
 # one request when the track changes, then held until that song ends.
-LYRIC_LIMIT = 12000
+# The screen keeps 400 lines. Stopping at 12000 characters, or at 80 unsynced
+# lines, left the last kept line on the panel for the rest of the song.
+LYRIC_MAX = 400
+LYRIC_LIMIT = 40000
 LYRIC_TIMEOUT = 4
 lyrics_cache = {"key": "", "synced": "", "until": 0.0}
 
@@ -189,14 +192,17 @@ def trim_lrc(text: str) -> str:
 
 
 def plain_as_lrc(plain: str, duration_s: int) -> str:
-    # No timestamps from the source. Spread the lines across the song so the
-    # panel still advances instead of pinning the first verse.
+    # No timestamps from the source. Spread the lines we keep across the whole
+    # song. The old code picked a step from every line, then emitted only the
+    # first 80, so that 80th line stayed up for the rest of the track.
     lines = [line.strip() for line in plain.splitlines() if line.strip()]
     if not lines or duration_s <= 0:
         return ""
+    if len(lines) > LYRIC_MAX:
+        lines = lines[:LYRIC_MAX]
     step = duration_s * 1000 / len(lines)
     rows = []
-    for index, line in enumerate(lines[:80]):
+    for index, line in enumerate(lines):
         total = int(index * step)
         minutes, remain = divmod(total, 60000)
         seconds, fraction = divmod(remain, 1000)

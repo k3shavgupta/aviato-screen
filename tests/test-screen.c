@@ -633,6 +633,32 @@ int main(void) {
   g_now.progress_at = mono();
   g_now.progress_ms = 13000;
   assert(spotify_lyric_index() == 1);
+  /* More than 80 synced lines must stay addressable. A 129-line track used to
+   * freeze on line 80 while the bar kept moving. */
+  {
+    char *body = malloc(8192);
+    assert(body);
+    int n = snprintf(body, 8192,
+      "{\"isLive\":true,\"title\":\"Long\",\"artist\":\"A\","
+      "\"albumArt\":\"https://i.scdn.co/image/abc\","
+      "\"progressMs\":180000,\"durationMs\":300000,\"syncedLyrics\":\"");
+    assert(n > 0 && n < 8192);
+    for (int i = 0; i < 100; i++) {
+      int ms = i * 2000;
+      n += snprintf(body + n, (size_t)(8192 - n), "[%02d:%02d.%03d] line %d\\n",
+                    ms / 60000, (ms / 1000) % 60, ms % 1000, i);
+      assert(n > 0 && n < 8000);
+    }
+    n += snprintf(body + n, (size_t)(8192 - n), "\"}");
+    assert(n > 0 && n < 8192);
+    assert(spotify_apply(body));
+    assert(g_lyric_n == 100 && g_lyrics[90].at_ms == 180000);
+    assert(!strcmp(g_lyrics[90].text, "line 90"));
+    g_now.progress_ms = 180000;
+    g_now.progress_at = mono();
+    assert(spotify_lyric_index() == 90);
+    free(body);
+  }
   assert(spotify_apply("{\"isLive\":true,\"title\":\"Caf\\u00e9\",\"artist\":\"Massive Attack\",\"albumArt\":\"https://i.scdn.co/image/abc\"}"));
   assert(g_lyric_n == 0);
   assert(!strcmp(g_now.art_url, "https://i.scdn.co/image/abc") && g_now.art_ok == 0);

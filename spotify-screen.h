@@ -34,9 +34,14 @@ typedef struct {
   unsigned char art[ART_RES * ART_RES * 3];
 } NowPlaying;
 
-/* One line of synced lyrics. The table is replaced only when a poll brings a
- * new song, then the panel walks it from the local playhead. */
-#define LYRIC_MAX 80
+/* One line of synced lyrics. The table is replaced when a poll brings lyrics,
+ * then the panel walks it from the local playhead.
+ *
+ * 80 froze a 129-line track on line 80: nothing past the cap is stored, so the
+ * last kept line has no successor and stays up while the progress bar, which
+ * uses the song duration, keeps moving. 400 is about one line every 1.5s for
+ * ten minutes. The raw buffer holds the whole LRC the bridge may send. */
+#define LYRIC_MAX 400
 #define LYRIC_CHARS 96
 typedef struct {
   int at_ms;
@@ -45,7 +50,7 @@ typedef struct {
 
 static LyricLine g_lyrics[LYRIC_MAX];
 static int g_lyric_n;
-static char g_lyric_raw[12288];
+static char g_lyric_raw[49152];
 
 static NowPlaying g_now;
 static CURL *g_spotify;
